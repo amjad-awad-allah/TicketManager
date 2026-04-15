@@ -1,4 +1,4 @@
-package api;
+package Api;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -90,7 +90,7 @@ public class ApiImporter {
                 kunden.add(UserMapper.mapToKunde(user));
             }
 
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.err.println("❌ Error parsing JSON: " + e.getMessage());
             e.printStackTrace();
         }

@@ -68,8 +68,6 @@ public class Kunde extends Benutzer {
 
     @Override
     public String toString() {
-        return "Kunde [id=" + getId() + ", name=" + getName() + ", username=" + username +
-                ", email=" + getEmail() + ", phone=" + phone + ", website=" + website +
-                ", address=" + address + ", company=" + company + "]";
+        return getName();
     }
 }

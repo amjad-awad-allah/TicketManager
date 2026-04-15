@@ -1,10 +1,8 @@
 package models;
 
-import java.io.Serializable;
-
 import exceptions.InvalidDataException;
 
-public abstract class Benutzer implements Identifiable, Serializable {
+public abstract class Benutzer implements Identifiable {
     private static final long serialVersionUID = 1L;
 
     private int id;

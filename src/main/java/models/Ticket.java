@@ -1,11 +1,10 @@
 package models;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import exceptions.InvalidDataException;
 
-public class Ticket implements Identifiable, Serializable {
+public class Ticket implements Identifiable {
     private static final long serialVersionUID = 1L;
 
     private int id;
@@ -30,6 +29,10 @@ public class Ticket implements Identifiable, Serializable {
         this.status = status;
         this.kunde = kunde;
         this.admin = admin;
+    }
+
+    public Ticket(String titel, String beschreibung, Priority priority, Kunde kunde) {
+        this(0, titel, beschreibung, priority, new Date(), Status.Open, kunde, null);
     }
 
     @Override
@@ -113,10 +116,7 @@ public class Ticket implements Identifiable, Serializable {
     }
 
     public void setAdmin(Admin admin) {
-
-        if (admin == null) {
-            throw new InvalidDataException("Admin cannot be null");
-        }
+        // Admin can be null for new tickets
         this.admin = admin;
     }
 
@@ -124,6 +124,6 @@ public class Ticket implements Identifiable, Serializable {
     public String toString() {
         return "Ticket [id=" + id + ", titel=" + titel + ", beschreibung=" + beschreibung + ", priority=" + priority
                 + ", datum=" + datum + ", status=" + status + ", kunde=" + kunde.getName() + ", admin="
-                + admin.getName() + "]";
+                + (admin != null ? admin.getName() : "null") + "]";
     }
 }
