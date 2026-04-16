@@ -1,15 +1,12 @@
 package gui;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
@@ -27,14 +24,11 @@ import javax.swing.UIManager;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 
-import Api.ApiImporter;
-import models.Kunde;
+import controllers.AppController;
 import models.Ticket;
-import repositories.Repository;
 
 public class MainFrame extends JFrame {
-    private Repository<Ticket> ticketRepo;
-    private Repository<Kunde> kundeRepo;
+    private final AppController controller;
     private JTable ticketTable;
     private TicketTableModel tableModel;
     private JTextField searchField;
@@ -42,28 +36,20 @@ public class MainFrame extends JFrame {
     private DashboardCard openCard;
     private DashboardCard highPriorityCard;
 
-    // Professional Color Palette
-    private static final Color BACKGROUND_COLOR = Color.decode("#F3F4F6"); // Gray 100
-    private static final Color SURFACE_COLOR = Color.decode("#FFFFFF");
-    private static final Color PRIMARY_COLOR = Color.decode("#4F46E5"); // Indigo 600
-    private static final Color TEXT_COLOR = Color.decode("#111827");
-    private static final Color BORDER_COLOR = Color.decode("#E5E7EB");
-
-    public MainFrame(Repository<Ticket> ticketRepo, Repository<Kunde> kundeRepo) {
-        this.ticketRepo = ticketRepo;
-        this.kundeRepo = kundeRepo;
+    public MainFrame(AppController controller) {
+        this.controller = controller;
 
         // Set modern look and feel for overall app
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-            UIManager.put("control", BACKGROUND_COLOR);
-            UIManager.put("info", SURFACE_COLOR);
-            UIManager.put("nimbusBase", PRIMARY_COLOR);
-            UIManager.put("nimbusFocus", PRIMARY_COLOR);
-            UIManager.put("nimbusLightBackground", SURFACE_COLOR);
-            UIManager.put("nimbusSelectedText", SURFACE_COLOR);
-            UIManager.put("nimbusSelectionBackground", PRIMARY_COLOR);
-            UIManager.put("text", TEXT_COLOR);
+            UIManager.put("control", Theme.BACKGROUND_COLOR);
+            UIManager.put("info", Theme.SURFACE_COLOR);
+            UIManager.put("nimbusBase", Theme.PRIMARY_COLOR);
+            UIManager.put("nimbusFocus", Theme.PRIMARY_COLOR);
+            UIManager.put("nimbusLightBackground", Theme.SURFACE_COLOR);
+            UIManager.put("nimbusSelectedText", Theme.SURFACE_COLOR);
+            UIManager.put("nimbusSelectionBackground", Theme.PRIMARY_COLOR);
+            UIManager.put("text", Theme.TEXT_COLOR);
         } catch (Exception e) {
             // Fallback to default
         }
@@ -72,16 +58,19 @@ public class MainFrame extends JFrame {
         setSize(1100, 768);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        getContentPane().setBackground(BACKGROUND_COLOR);
+        getContentPane().setBackground(Theme.BACKGROUND_COLOR);
 
         initComponents();
-        loadData();
 
         // Save data on close
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                saveData();
+                try {
+                    controller.saveData();
+                } catch (Exception ex) {
+                    System.err.println("Could not auto-save: " + ex.getMessage());
+                }
             }
         });
     }
@@ -89,27 +78,66 @@ public class MainFrame extends JFrame {
     private void initComponents() {
         // Menu bar
         JMenuBar menuBar = new JMenuBar();
-        menuBar.setBackground(SURFACE_COLOR);
-        menuBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER_COLOR));
+        menuBar.setBackground(Theme.SURFACE_COLOR);
+        menuBar.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Theme.BORDER_COLOR));
         
         JMenu fileMenu = new JMenu("File");
-        fileMenu.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        fileMenu.setFont(Theme.FONT_REGULAR);
 
         JMenuItem saveItem = new JMenuItem("Save Data");
-        saveItem.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        saveItem.addActionListener(e -> saveData());
+        saveItem.setFont(Theme.FONT_REGULAR);
+        saveItem.addActionListener(e -> {
+            try {
+                controller.saveData();
+                ToastNotification.showToast("Data saved successfully.");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
         fileMenu.add(saveItem);
 
         JMenuItem loadItem = new JMenuItem("Reload Data");
-        loadItem.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        loadItem.addActionListener(e -> loadData());
+        loadItem.setFont(Theme.FONT_REGULAR);
+        loadItem.addActionListener(e -> {
+            controller.loadData();
+            ToastNotification.showToast("Data reloaded.");
+        });
         fileMenu.add(loadItem);
+
+        JMenuItem generateRandomItem = new JMenuItem("Generate 10 Random Tickets");
+        generateRandomItem.setFont(Theme.FONT_REGULAR);
+        generateRandomItem.addActionListener(e -> {
+            controller.generateRandomTickets();
+            ToastNotification.showToast("10 random tickets generated.");
+        });
+        fileMenu.add(generateRandomItem);
+
+        JMenuItem clearItem = new JMenuItem("Clear All Data");
+        clearItem.setFont(Theme.FONT_REGULAR);
+        clearItem.setForeground(Theme.DANGER_COLOR);
+        clearItem.addActionListener(e -> {
+            int response = JOptionPane.showConfirmDialog(this,
+                    "Are you sure you want to permanently clear ALL tickets and customers from memory?",
+                    "Confirm Reset", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+            if (response == JOptionPane.YES_OPTION) {
+                controller.clearAllData();
+                ToastNotification.showToast("All data cleared from memory.");
+            }
+        });
+        fileMenu.add(clearItem);
 
         fileMenu.addSeparator();
 
         JMenuItem importItem = new JMenuItem("Import Customers from API");
-        importItem.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        importItem.addActionListener(e -> importCustomers());
+        importItem.setFont(Theme.FONT_REGULAR);
+        importItem.addActionListener(e -> {
+            try {
+                controller.importCustomers();
+                ToastNotification.showToast("Customers imported from API");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "API Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
         fileMenu.add(importItem);
 
         menuBar.add(fileMenu);
@@ -117,33 +145,25 @@ public class MainFrame extends JFrame {
 
         // Header Panel
         JPanel headerPanel = new JPanel(new BorderLayout());
-        headerPanel.setBackground(SURFACE_COLOR);
+        headerPanel.setBackground(Theme.SURFACE_COLOR);
         headerPanel.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER_COLOR),
+                BorderFactory.createMatteBorder(0, 0, 1, 0, Theme.BORDER_COLOR),
                 BorderFactory.createEmptyBorder(20, 30, 20, 30)
         ));
 
         JLabel titleLabel = new JLabel("Tickets");
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 24));
-        titleLabel.setForeground(TEXT_COLOR);
+        titleLabel.setFont(Theme.FONT_HEADER);
+        titleLabel.setForeground(Theme.TEXT_COLOR);
         headerPanel.add(titleLabel, BorderLayout.WEST);
 
         // Actions panel inside header
         JPanel actionsPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 15, 0));
-        actionsPanel.setBackground(SURFACE_COLOR);
+        actionsPanel.setBackground(Theme.SURFACE_COLOR);
 
-        searchField = new JTextField(20);
-        searchField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        searchField.putClientProperty("JTextField.placeholderText", "Search tickets...");
-        searchField.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER_COLOR, 1, true),
-                BorderFactory.createEmptyBorder(6, 12, 6, 12)
-        ));
+        searchField = UIFactory.createSearchField("Search Title, ID or Customer...");
+        searchField.setColumns(20);
         
-        // Add Enter key listener
         searchField.addActionListener(e -> tableModel.applyFilter(searchField.getText()));
-        
-        // Add live-search (while typing) listener
         searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
             @Override
             public void changedUpdate(javax.swing.event.DocumentEvent e) { search(); }
@@ -156,18 +176,21 @@ public class MainFrame extends JFrame {
             }
         });
 
-        RoundedButton searchButton = createFlatButton("Search", SURFACE_COLOR, TEXT_COLOR);
+        RoundedButton searchButton = new RoundedButton("Search", 16);
+        searchButton.setFont(Theme.FONT_BOLD);
+        searchButton.setBackground(Theme.SURFACE_COLOR);
+        searchButton.setForeground(Theme.TEXT_COLOR);
         searchButton.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER_COLOR, 1, true),
-                BorderFactory.createEmptyBorder(6, 16, 6, 16)
+                BorderFactory.createLineBorder(Theme.BORDER_COLOR, 1, true),
+                BorderFactory.createEmptyBorder(8, 16, 8, 16)
         ));
-        
-        searchButton.addActionListener(e -> {
-            String query = searchField.getText();
-            tableModel.applyFilter(query);
-        });
+        searchButton.addActionListener(e -> tableModel.applyFilter(searchField.getText()));
 
-        RoundedButton createButton = createFlatButton("+ New Ticket", PRIMARY_COLOR, SURFACE_COLOR);
+        RoundedButton createButton = new RoundedButton("+ New Ticket", 16);
+        createButton.setFont(Theme.FONT_BOLD);
+        createButton.setBackground(Theme.PRIMARY_COLOR);
+        createButton.setForeground(Theme.SURFACE_COLOR);
+        createButton.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
         createButton.addActionListener(e -> createTicket());
 
         actionsPanel.add(searchField);
@@ -177,17 +200,17 @@ public class MainFrame extends JFrame {
 
         // Content Panel Component
         JPanel mainContentPanel = new JPanel(new BorderLayout());
-        mainContentPanel.setBackground(BACKGROUND_COLOR);
+        mainContentPanel.setBackground(Theme.BACKGROUND_COLOR);
         mainContentPanel.setBorder(BorderFactory.createEmptyBorder(20, 30, 30, 30));
 
         // Dashboard Cards Panel
         JPanel dashboardPanel = new JPanel(new GridLayout(1, 3, 20, 0));
-        dashboardPanel.setBackground(BACKGROUND_COLOR);
+        dashboardPanel.setBackground(Theme.BACKGROUND_COLOR);
         dashboardPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 20, 0));
         
-        totalCard = new DashboardCard("Total Tickets", Color.decode("#6366F1")); // Indigo 500
-        openCard = new DashboardCard("Open Tickets", Color.decode("#10B981")); // Emerald 500
-        highPriorityCard = new DashboardCard("High Priority", Color.decode("#EF4444")); // Red 500
+        totalCard = new DashboardCard("Total Tickets", Theme.PRIMARY_COLOR);
+        openCard = new DashboardCard("Open Tickets", Theme.SUCCESS_COLOR);
+        highPriorityCard = new DashboardCard("High Priority", Theme.DANGER_COLOR);
         
         dashboardPanel.add(totalCard);
         dashboardPanel.add(openCard);
@@ -196,27 +219,26 @@ public class MainFrame extends JFrame {
         mainContentPanel.add(dashboardPanel, BorderLayout.NORTH);
 
         // Table Setup
-        tableModel = new TicketTableModel(ticketRepo.getAll());
+        tableModel = new TicketTableModel(controller.getTicketRepo().getAll());
         ticketTable = new JTable(tableModel);
-        ticketTable.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        ticketTable.setFont(Theme.FONT_REGULAR);
         ticketTable.setRowHeight(40);
         ticketTable.setShowGrid(false);
         ticketTable.setIntercellSpacing(new Dimension(0, 0));
-        ticketTable.setBackground(SURFACE_COLOR);
-        ticketTable.setForeground(TEXT_COLOR);
-        ticketTable.setSelectionBackground(Color.decode("#EDF2F7")); // Light grayish blue
-        ticketTable.setSelectionForeground(TEXT_COLOR);
+        ticketTable.setBackground(Theme.SURFACE_COLOR);
+        ticketTable.setForeground(Theme.TEXT_COLOR);
+        ticketTable.setSelectionBackground(Theme.NEUTRAL_COMPONENT_COLOR);
+        ticketTable.setSelectionForeground(Theme.TEXT_COLOR);
         ticketTable.setFillsViewportHeight(true);
         ticketTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         ticketTable.setAutoCreateRowSorter(true); // Enable column sorting
         
-        // Listen to selection to open view popup
         ticketTable.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent e) {
                 int row = ticketTable.rowAtPoint(e.getPoint());
                 int col = ticketTable.columnAtPoint(e.getPoint());
-                if (row >= 0 && col != 7) { // col 7 is Actions
+                if (row >= 0 && col != 7) { 
                     viewSelectedTicket(row);
                 }
             }
@@ -224,10 +246,10 @@ public class MainFrame extends JFrame {
 
         // Header Styling
         JTableHeader tableHeader = ticketTable.getTableHeader();
-        tableHeader.setFont(new Font("Segoe UI", Font.BOLD, 13));
-        tableHeader.setBackground(Color.decode("#F9FAFB"));
-        tableHeader.setForeground(Color.decode("#4B5563")); // Gray 600
-        tableHeader.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER_COLOR));
+        tableHeader.setFont(Theme.FONT_BOLD);
+        tableHeader.setBackground(Theme.BACKGROUND_COLOR);
+        tableHeader.setForeground(Theme.SECONDARY_TEXT_COLOR);
+        tableHeader.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Theme.BORDER_COLOR));
         tableHeader.setPreferredSize(new Dimension(100, 40));
         
         // Custom Table Cell Renderer for padding and flat border
@@ -236,7 +258,7 @@ public class MainFrame extends JFrame {
             public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
                 Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
                 setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createMatteBorder(0, 0, 1, 0, BORDER_COLOR),
+                    BorderFactory.createMatteBorder(0, 0, 1, 0, Theme.BORDER_COLOR),
                     BorderFactory.createEmptyBorder(0, 15, 0, 15)
                 ));
                 return c;
@@ -255,8 +277,8 @@ public class MainFrame extends JFrame {
         ticketTable.getColumnModel().getColumn(7).setPreferredWidth(160);
 
         JScrollPane tableScrollPane = new JScrollPane(ticketTable);
-        tableScrollPane.setBorder(BorderFactory.createLineBorder(BORDER_COLOR, 1));
-        tableScrollPane.getViewport().setBackground(SURFACE_COLOR);
+        tableScrollPane.setBorder(BorderFactory.createLineBorder(Theme.BORDER_COLOR, 1));
+        tableScrollPane.getViewport().setBackground(Theme.SURFACE_COLOR);
         
         mainContentPanel.add(tableScrollPane, BorderLayout.CENTER);
 
@@ -264,38 +286,11 @@ public class MainFrame extends JFrame {
         add(mainContentPanel, BorderLayout.CENTER);
     }
     
-    private RoundedButton createFlatButton(String text, Color bg, Color fg) {
-        RoundedButton button = new RoundedButton(text, 16);
-        button.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        button.setBackground(bg);
-        button.setForeground(fg);
-        button.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-        return button;
-    }
-
-    private void createTicket() {
-        CreateTicketDialog dialog = new CreateTicketDialog(this, kundeRepo.getAll());
-        dialog.setVisible(true);
-        if (dialog.isConfirmed()) {
-            Ticket ticket = dialog.getTicket();
-            try {
-                ticketRepo.add(ticket);
-                tableModel.updateData(ticketRepo.getAll());
-                String currentFilter = searchField.getText();
-                tableModel.applyFilter(currentFilter);
-                updateDashboardCards();
-            } catch (Exception ex) {
-                JOptionPane.showMessageDialog(this, "Error creating ticket: " + ex.getMessage(), "Error",
-                        JOptionPane.ERROR_MESSAGE);
-            }
-        }
-    }
-
-    private void updateDashboardCards() {
-        int total = 0;
-        int open = 0;
-        int high = 0;
-        for (Ticket t : ticketRepo.getAll()) {
+    public void refreshData() {
+        tableModel.updateData(controller.getTicketRepo().getAll());
+        
+        int total = 0, open = 0, high = 0;
+        for (Ticket t : controller.getTicketRepo().getAll()) {
             total++;
             if (t.getStatus() == models.Status.Open || t.getStatus() == models.Status.InProgress) open++; 
             if (t.getPriority() == models.Priority.HIGH) high++;
@@ -303,13 +298,29 @@ public class MainFrame extends JFrame {
         totalCard.updateCount(total);
         openCard.updateCount(open);
         highPriorityCard.updateCount(high);
+
+        // Keep current search filter active
+        tableModel.applyFilter(searchField.getText());
+    }
+
+    private void createTicket() {
+        TicketFormDialog dialog = new TicketFormDialog(this, null, controller.getKundeRepo().getAll(), false);
+        dialog.setVisible(true);
+        if (dialog.isConfirmed()) {
+            try {
+                controller.addTicket(dialog.getTicket());
+                ToastNotification.showToast("Ticket created.");
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(this, "Error creating ticket: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
     }
     
     private void viewSelectedTicket(int row) {
         int modelRow = ticketTable.convertRowIndexToModel(row);
         Ticket t = tableModel.getTicketAt(modelRow);
         if (t != null) {
-            EditTicketDialog dialog = new EditTicketDialog(this, t, kundeRepo.getAll(), true);
+            TicketFormDialog dialog = new TicketFormDialog(this, t, controller.getKundeRepo().getAll(), true);
             dialog.setVisible(true);
         }
     }
@@ -319,11 +330,11 @@ public class MainFrame extends JFrame {
             int modelRow = ticketTable.convertRowIndexToModel(row);
             Ticket t = tableModel.getTicketAt(modelRow);
             if (t != null) {
-                EditTicketDialog dialog = new EditTicketDialog(this, t, kundeRepo.getAll(), false);
+                TicketFormDialog dialog = new TicketFormDialog(this, t, controller.getKundeRepo().getAll(), false);
                 dialog.setVisible(true);
                 if (dialog.isConfirmed()) {
-                    tableModel.updateData(ticketRepo.getAll());
-                    updateDashboardCards();
+                    controller.updateTicket();
+                    ToastNotification.showToast("Ticket updated.");
                 }
             }
         }
@@ -339,52 +350,13 @@ public class MainFrame extends JFrame {
                         "Confirm Deletion", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
                 if (response == JOptionPane.YES_OPTION) {
                     try {
-                        ticketRepo.remove(t);
-                        tableModel.updateData(ticketRepo.getAll());
-                        updateDashboardCards();
+                        controller.removeTicket(t);
+                        ToastNotification.showToast("Ticket deleted.");
                     } catch (Exception ex) {
-                        JOptionPane.showMessageDialog(this, "Error deleting ticket: " + ex.getMessage(), "Error",
-                                JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(this, "Error deleting ticket: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             }
-        }
-    }
-
-    private void saveData() {
-        try {
-            repositories.PersistenceManager.save("tickets.dat", ticketRepo.getAll());
-            repositories.PersistenceManager.save("kunden.dat", kundeRepo.getAll());
-            ToastNotification.showToast("Data saved successfully.");
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error saving data: " + ex.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void loadData() {
-        try {
-            ticketRepo.items = repositories.PersistenceManager.load("tickets.dat");
-            kundeRepo.items = repositories.PersistenceManager.load("kunden.dat");
-            tableModel.updateData(ticketRepo.getAll());
-            updateDashboardCards();
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error loading data: " + ex.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    private void importCustomers() {
-        try {
-            List<Kunde> imported = ApiImporter.importKundenFromApi();
-            kundeRepo.clear();
-            for (Kunde k : imported) {
-                kundeRepo.add(k);
-            }
-            ToastNotification.showToast("Imported " + imported.size() + " customers successfully.");
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(this, "Error importing customers: " + ex.getMessage(), "Error",
-                    JOptionPane.ERROR_MESSAGE);
         }
     }
 }

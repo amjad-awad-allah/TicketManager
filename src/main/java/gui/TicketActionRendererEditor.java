@@ -2,7 +2,9 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
@@ -21,31 +23,34 @@ public class TicketActionRendererEditor extends AbstractCellEditor implements Ta
     public TicketActionRendererEditor(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         
+        java.awt.GridBagConstraints gbc = new java.awt.GridBagConstraints();
+        gbc.insets = new java.awt.Insets(0, 4, 0, 4);
+        
         renderPanel = createPanel();
-        btnEditRender = createButton("Edit", Color.decode("#4F46E5"));
-        btnDeleteRender = createButton("Delete", Color.decode("#EF4444"));
-        renderPanel.add(btnEditRender);
-        renderPanel.add(btnDeleteRender);
+        btnEditRender = createButton("Edit", Theme.PRIMARY_COLOR);
+        btnDeleteRender = createButton("Delete", Theme.DANGER_COLOR);
+        renderPanel.add(btnEditRender, gbc);
+        renderPanel.add(btnDeleteRender, gbc);
         editPanel = createPanel();
-        RoundedButton btnEdit = createButton("Edit", Color.decode("#4F46E5"));
+        RoundedButton btnEdit = createButton("Edit", Theme.PRIMARY_COLOR);
         btnEdit.addActionListener(e -> {
             fireEditingStopped();
             this.mainFrame.editTicketFromTable(currentRow);
         });
-        RoundedButton btnDelete = createButton("Delete", Color.decode("#EF4444"));
+        RoundedButton btnDelete = createButton("Delete", Theme.DANGER_COLOR);
         btnDelete.addActionListener(e -> {
             fireEditingStopped();
             this.mainFrame.deleteTicketFromTable(currentRow);
         });
-        editPanel.add(btnEdit);
-        editPanel.add(btnDelete);
+        editPanel.add(btnEdit, gbc);
+        editPanel.add(btnDelete, gbc);
     }
     
     private JPanel createPanel() {
-        JPanel p = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 0));
+        JPanel p = new JPanel(new GridBagLayout());
         p.setOpaque(true);
         // Matte lower border to match MainFrame table cells
-        p.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.decode("#E5E7EB")));
+        p.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Theme.BORDER_COLOR));
         return p;
     }
 

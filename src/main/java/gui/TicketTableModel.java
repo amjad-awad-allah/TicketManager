@@ -25,11 +25,13 @@ public class TicketTableModel extends AbstractTableModel {
         if (filter == null || filter.trim().isEmpty()) {
             filteredTickets = allTickets;
         } else {
+            String lowerFilter = filter.toLowerCase();
             filteredTickets = allTickets.stream()
-                    .filter(ticket -> ticket.getTitel().toLowerCase().contains(filter.toLowerCase()) ||
-                            ticket.getBeschreibung().toLowerCase().contains(filter.toLowerCase()) ||
+                    .filter(ticket -> String.valueOf(ticket.getId()).contains(lowerFilter) ||
+                            ticket.getTitel().toLowerCase().contains(lowerFilter) ||
+                            ticket.getBeschreibung().toLowerCase().contains(lowerFilter) ||
                             (ticket.getKunde() != null
-                                    && ticket.getKunde().getName().toLowerCase().contains(filter.toLowerCase())))
+                                    && ticket.getKunde().getName().toLowerCase().contains(lowerFilter)))
                     .toList();
         }
         fireTableDataChanged();
