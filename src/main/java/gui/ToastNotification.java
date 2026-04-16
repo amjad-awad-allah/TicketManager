@@ -2,15 +2,14 @@ package gui;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.geom.RoundRectangle2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.geom.RoundRectangle2D;
 
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -39,12 +38,12 @@ public class ToastNotification extends JWindow {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
                 // Deep Indigo Background (Matches Theme.PRIMARY_COLOR but slightly richer)
-                g2.setColor(new Color(79, 70, 229)); 
+                g2.setColor(Theme.PRIMARY_COLOR_LIGHT); 
                 g2.fill(new RoundRectangle2D.Float(0, 0, getWidth(), getHeight(), 30, 30));
 
                 // Subtle inner glow/border
                 g2.setColor(new Color(255, 255, 255, 60));
-                g2.setStroke(new java.awt.BasicStroke(1));
+                g2.setStroke(new java.awt.BasicStroke(0.5f));
                 g2.draw(new RoundRectangle2D.Float(2, 2, getWidth() - 4, getHeight() - 4, 28, 28));
                 
                 g2.dispose();
