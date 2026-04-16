@@ -13,6 +13,7 @@ import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -21,15 +22,17 @@ import javax.swing.JTextField;
 import exceptions.InvalidDataException;
 import models.Kunde;
 import models.Priority;
+import models.Status;
 import models.Ticket;
 
-public class CreateTicketDialog extends JDialog {
+public class EditTicketDialog extends JDialog {
     private final JTextField titleField;
     private final JTextArea descriptionArea;
     private final JComboBox<Priority> priorityBox;
+    private final JComboBox<Status> statusBox;
     private final JComboBox<Kunde> customerBox;
-    private final RoundedButton createButton;
     private final RoundedButton cancelButton;
+    private final RoundedButton saveButton;
     private boolean confirmed = false;
     private Ticket ticket;
 
@@ -42,9 +45,11 @@ public class CreateTicketDialog extends JDialog {
     private static final Color BORDER_COLOR = Color.decode("#E5E7EB");
     private static final Color CANCEL_BUTTON_COLOR = Color.decode("#F3F4F6");
 
-    public CreateTicketDialog(JFrame parent, List<Kunde> customers) {
-        super(parent, "Create Ticket", true);
-        setSize(550, 600);
+    public EditTicketDialog(JFrame parent, Ticket ticketToEdit, List<Kunde> customers, boolean isViewOnly) {
+        super(parent, isViewOnly ? "Ticket Details" : "Ticket Details / Edit", true);
+        this.ticket = ticketToEdit;
+        
+        setSize(550, 650);
         setLocationRelativeTo(parent);
         setLayout(new BorderLayout());
         getContentPane().setBackground(BACKGROUND_COLOR);
@@ -73,7 +78,8 @@ public class CreateTicketDialog extends JDialog {
         // Title Field
         gbc.gridy = 1;
         gbc.insets = new Insets(0, 0, 16, 0);
-        titleField = new JTextField();
+        titleField = new JTextField(ticket.getTitel());
+        titleField.setEditable(!isViewOnly);
         titleField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         titleField.setForeground(TEXT_COLOR);
         titleField.setBackground(SURFACE_COLOR);
@@ -95,7 +101,8 @@ public class CreateTicketDialog extends JDialog {
         gbc.insets = new Insets(0, 0, 16, 0);
         gbc.weighty = 1.0;
         gbc.fill = GridBagConstraints.BOTH;
-        descriptionArea = new JTextArea(5, 20);
+        descriptionArea = new JTextArea(ticket.getBeschreibung(), 5, 20);
+        descriptionArea.setEditable(!isViewOnly);
         descriptionArea.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         descriptionArea.setForeground(TEXT_COLOR);
         descriptionArea.setBackground(SURFACE_COLOR);
@@ -108,27 +115,46 @@ public class CreateTicketDialog extends JDialog {
         descScroll.setBorder(BorderFactory.createEmptyBorder());
         formPanel.add(descScroll, gbc);
 
-        // Priority Label
-        gbc.gridy = 4;
-        gbc.weighty = 0.0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(10, 0, 5, 0);
+        // Priority and Status Panel
+        JPanel comboPanel = new JPanel(new GridBagLayout());
+        comboPanel.setBackground(SURFACE_COLOR);
+        GridBagConstraints cGbc = new GridBagConstraints();
+        cGbc.fill = GridBagConstraints.HORIZONTAL;
+        cGbc.weightx = 1.0;
+        
         JLabel priorityLabel = new JLabel("Priority");
         priorityLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
         priorityLabel.setForeground(TEXT_COLOR);
-        formPanel.add(priorityLabel, gbc);
-
-        // Priority ComboBox
-        gbc.gridy = 5;
-        gbc.insets = new Insets(0, 0, 16, 0);
+        cGbc.gridx = 0; cGbc.gridy = 0; cGbc.insets = new Insets(0, 0, 5, 10);
+        comboPanel.add(priorityLabel, cGbc);
+        
         priorityBox = new JComboBox<>(Priority.values());
+        priorityBox.setEnabled(!isViewOnly);
+        priorityBox.setSelectedItem(ticket.getPriority());
         priorityBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        priorityBox.setForeground(TEXT_COLOR);
         priorityBox.setBackground(SURFACE_COLOR);
-        priorityBox.setBorder(BorderFactory.createCompoundBorder(
-                BorderFactory.createLineBorder(BORDER_COLOR, 1),
-                BorderFactory.createEmptyBorder(6, 6, 6, 6)));
-        formPanel.add(priorityBox, gbc);
+        cGbc.gridy = 1; cGbc.insets = new Insets(0, 0, 0, 10);
+        comboPanel.add(priorityBox, cGbc);
+
+        JLabel statusLabel = new JLabel("Status");
+        statusLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+        statusLabel.setForeground(TEXT_COLOR);
+        cGbc.gridx = 1; cGbc.gridy = 0; cGbc.insets = new Insets(0, 0, 5, 0);
+        comboPanel.add(statusLabel, cGbc);
+        
+        statusBox = new JComboBox<>(Status.values());
+        statusBox.setEnabled(!isViewOnly);
+        statusBox.setSelectedItem(ticket.getStatus());
+        statusBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
+        statusBox.setBackground(SURFACE_COLOR);
+        cGbc.gridy = 1; cGbc.insets = new Insets(0, 0, 0, 0);
+        comboPanel.add(statusBox, cGbc);
+
+        gbc.gridy = 4;
+        gbc.weighty = 0.0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(10, 0, 16, 0);
+        formPanel.add(comboPanel, gbc);
 
         // Customer Label
         gbc.gridy = 6;
@@ -142,6 +168,17 @@ public class CreateTicketDialog extends JDialog {
         gbc.gridy = 7;
         gbc.insets = new Insets(0, 0, 24, 0);
         customerBox = new JComboBox<>(customers.toArray(new Kunde[0]));
+        // Select current customer
+        if (ticket.getKunde() != null) {
+            for (int i = 0; i < customerBox.getItemCount(); i++) {
+                if (customerBox.getItemAt(i).getId() == ticket.getKunde().getId()) {
+                    customerBox.setSelectedIndex(i);
+                    break;
+                }
+            }
+        }
+        
+        customerBox.setEnabled(!isViewOnly);
         customerBox.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         customerBox.setForeground(TEXT_COLOR);
         customerBox.setBackground(SURFACE_COLOR);
@@ -150,7 +187,7 @@ public class CreateTicketDialog extends JDialog {
                 BorderFactory.createEmptyBorder(6, 6, 6, 6)));
         formPanel.add(customerBox, gbc);
 
-        // Center content wrapped to limit extreme horizontal stretching if window is wide
+        // Center content wrapped
         JPanel centerWrapper = new JPanel(new BorderLayout());
         centerWrapper.setBackground(BACKGROUND_COLOR);
         centerWrapper.setBorder(BorderFactory.createEmptyBorder(20, 20, 0, 20));
@@ -166,7 +203,7 @@ public class CreateTicketDialog extends JDialog {
         JPanel buttonSubPanel = new JPanel();
         buttonSubPanel.setBackground(BACKGROUND_COLOR);
 
-        cancelButton = new RoundedButton("Cancel", 16);
+        cancelButton = new RoundedButton(isViewOnly ? "Close" : "Cancel", 16);
         cancelButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
         cancelButton.setForeground(SECONDARY_TEXT_COLOR);
         cancelButton.setBackground(CANCEL_BUTTON_COLOR);
@@ -174,46 +211,50 @@ public class CreateTicketDialog extends JDialog {
         cancelButton.addActionListener(e -> setVisible(false));
         buttonSubPanel.add(cancelButton);
 
-        createButton = new RoundedButton("Create Ticket", 16);
-        createButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        createButton.setForeground(Color.WHITE);
-        createButton.setBackground(PRIMARY_COLOR);
-        createButton.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
-        createButton.addActionListener(e -> {
-            try {
-                createTicket();
-                confirmed = true;
-                setVisible(false);
-            } catch (InvalidDataException ex) {
-                javax.swing.JOptionPane.showMessageDialog(this, ex.getMessage(), "Error",
-                        javax.swing.JOptionPane.ERROR_MESSAGE);
-            }
-        });
-        buttonSubPanel.add(createButton);
+        if (!isViewOnly) {
+            saveButton = new RoundedButton("Save Changes", 16);
+            saveButton.setFont(new Font("Segoe UI", Font.BOLD, 14));
+            saveButton.setForeground(Color.WHITE);
+            saveButton.setBackground(PRIMARY_COLOR);
+            saveButton.setBorder(BorderFactory.createEmptyBorder(8, 20, 8, 20));
+            saveButton.addActionListener(e -> {
+                try {
+                    updateTicket();
+                    confirmed = true;
+                    setVisible(false);
+                } catch (InvalidDataException ex) {
+                    JOptionPane.showMessageDialog(this, ex.getMessage(), "Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            });
+            buttonSubPanel.add(saveButton);
+        } else {
+            saveButton = null;
+        }
 
         buttonPanel.add(buttonSubPanel, BorderLayout.EAST);
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    private void createTicket() throws InvalidDataException {
+    private void updateTicket() throws InvalidDataException {
         String title = titleField.getText().trim();
         String description = descriptionArea.getText().trim();
         Priority priority = (Priority) priorityBox.getSelectedItem();
+        Status status = (Status) statusBox.getSelectedItem();
         Kunde customer = (Kunde) customerBox.getSelectedItem();
 
         if (title.isEmpty()) {
             throw new InvalidDataException("Title cannot be empty");
         }
 
-        ticket = new Ticket(title, description, priority, customer);
-        // Status and date are set in constructor
+        ticket.setTitel(title);
+        ticket.setBeschreibung(description);
+        ticket.setPriority(priority);
+        ticket.setStatus(status);
+        ticket.setKunde(customer);
     }
 
     public boolean isConfirmed() {
         return confirmed;
-    }
-
-    public Ticket getTicket() {
-        return ticket;
     }
 }

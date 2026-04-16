@@ -9,7 +9,7 @@ import models.Ticket;
 public class TicketTableModel extends AbstractTableModel {
     private List<Ticket> allTickets;
     private List<Ticket> filteredTickets;
-    private String[] columnNames = { "ID", "Title", "Description", "Priority", "Status", "Customer", "Date" };
+    private final String[] columnNames = { "ID", "Title", "Description", "Priority", "Status", "Customer", "Date", "Actions" };
 
     public TicketTableModel(List<Ticket> tickets) {
         this.allTickets = tickets;
@@ -35,6 +35,13 @@ public class TicketTableModel extends AbstractTableModel {
         fireTableDataChanged();
     }
 
+    public Ticket getTicketAt(int rowIndex) {
+        if (rowIndex >= 0 && rowIndex < filteredTickets.size()) {
+            return filteredTickets.get(rowIndex);
+        }
+        return null;
+    }
+
     @Override
     public int getRowCount() {
         return filteredTickets.size();
@@ -53,23 +60,21 @@ public class TicketTableModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         Ticket ticket = filteredTickets.get(rowIndex);
-        switch (columnIndex) {
-            case 0:
-                return ticket.getId();
-            case 1:
-                return ticket.getTitel();
-            case 2:
-                return ticket.getBeschreibung();
-            case 3:
-                return ticket.getPriority();
-            case 4:
-                return ticket.getStatus();
-            case 5:
-                return ticket.getKunde() != null ? ticket.getKunde().getName() : "";
-            case 6:
-                return ticket.getDatum();
-            default:
-                return null;
-        }
+        return switch (columnIndex) {
+            case 0 -> ticket.getId();
+            case 1 -> ticket.getTitel();
+            case 2 -> ticket.getBeschreibung();
+            case 3 -> ticket.getPriority();
+            case 4 -> ticket.getStatus();
+            case 5 -> ticket.getKunde() != null ? ticket.getKunde().getName() : "";
+            case 6 -> ticket.getDatum();
+            case 7 -> ""; // Action column
+            default -> null;
+        };
+    }
+    
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return columnIndex == 7;
     }
 }
