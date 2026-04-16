@@ -1,7 +1,12 @@
 package models;
 
 public enum Status {
-    Open,
-    InProgress,
-    Closed
+    Offen,
+    In_Bearbeitung,
+    Geschlossen;
+
+    @Override
+    public String toString() {
+        return name().replace("_", " ");
+    }
 }

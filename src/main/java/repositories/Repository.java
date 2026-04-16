@@ -3,7 +3,7 @@ package repositories;
 import java.util.ArrayList;
 import java.util.List;
 
-import exceptions.TicketNotFoundExceptione;
+import exceptions.TicketNotFoundException;
 import models.Identifiable;
 
 public class Repository<T extends Identifiable> {
@@ -29,7 +29,7 @@ public class Repository<T extends Identifiable> {
             }
         }
 
-        throw new TicketNotFoundExceptione("Item with ID " + id + " not found");
+        throw new TicketNotFoundException("Item with ID " + id + " not found");
 
     }
 

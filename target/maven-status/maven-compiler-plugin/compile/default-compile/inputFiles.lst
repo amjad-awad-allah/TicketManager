@@ -7,7 +7,7 @@ C:\Users\User\Desktop\git\TicketManager\src\main\java\dto\CompanyResponse.java
 C:\Users\User\Desktop\git\TicketManager\src\main\java\dto\GeoResponse.java
 C:\Users\User\Desktop\git\TicketManager\src\main\java\dto\UserResponse.java
 C:\Users\User\Desktop\git\TicketManager\src\main\java\exceptions\InvalidDataException.java
-C:\Users\User\Desktop\git\TicketManager\src\main\java\exceptions\TicketNotFoundExceptione.java
+C:\Users\User\Desktop\git\TicketManager\src\main\java\exceptions\TicketNotFoundException.java
 C:\Users\User\Desktop\git\TicketManager\src\main\java\gui\DashboardCard.java
 C:\Users\User\Desktop\git\TicketManager\src\main\java\gui\MainFrame.java
 C:\Users\User\Desktop\git\TicketManager\src\main\java\gui\RoundedButton.java
@@ -21,7 +21,6 @@ C:\Users\User\Desktop\git\TicketManager\src\main\java\Main.java
 C:\Users\User\Desktop\git\TicketManager\src\main\java\mapper\UserMapper.java
 C:\Users\User\Desktop\git\TicketManager\src\main\java\models\Address.java
 C:\Users\User\Desktop\git\TicketManager\src\main\java\models\Admin.java
-C:\Users\User\Desktop\git\TicketManager\src\main\java\models\App.java
 C:\Users\User\Desktop\git\TicketManager\src\main\java\models\Benutzer.java
 C:\Users\User\Desktop\git\TicketManager\src\main\java\models\Company.java
 C:\Users\User\Desktop\git\TicketManager\src\main\java\models\Identifiable.java

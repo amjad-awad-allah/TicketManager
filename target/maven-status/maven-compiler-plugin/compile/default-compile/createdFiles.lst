@@ -1,9 +1,10 @@
 models\Kunde.class
 models\Identifiable.class
+gui\ToastNotification$2.class
+exceptions\TicketNotFoundException.class
 dto\AddressResponse.class
 gui\TicketActionRendererEditor.class
 models\Status.class
-exceptions\TicketNotFoundExceptione.class
 models\Benutzer.class
 models\Ticket.class
 controllers\AppController.class
@@ -35,5 +36,4 @@ models\Address.class
 repositories\PersistenceManager.class
 dto\GeoResponse.class
 gui\TicketTableModel.class
-models\App.class
 gui\MainFrame$1.class

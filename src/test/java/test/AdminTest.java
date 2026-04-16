@@ -18,7 +18,6 @@ public class AdminTest {
     @Test
     public void testToString() {
         Admin admin = new Admin(1, "Admin Name", "admin@test.com");
-        String expected = "Admin [id=1, name=Admin Name, email=admin@test.com]";
-        Assert.assertEquals(expected, admin.toString());
+        Assert.assertEquals("Admin Name", admin.toString());
     }
 }

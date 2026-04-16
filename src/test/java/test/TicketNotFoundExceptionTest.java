@@ -1,15 +1,15 @@
 package test;
 
-import exceptions.TicketNotFoundExceptione;
+import exceptions.TicketNotFoundException;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class TicketNotFoundExceptioneTest {
+public class TicketNotFoundExceptionTest {
 
     @Test
     public void testConstructor() {
         String message = "Ticket not found";
-        TicketNotFoundExceptione exception = new TicketNotFoundExceptione(message);
+        TicketNotFoundException exception = new TicketNotFoundException(message);
         Assert.assertEquals(message, exception.getMessage());
     }
 }

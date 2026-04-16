@@ -18,9 +18,6 @@ public class KundeTest {
     @Test
     public void testToString() {
         Kunde kunde = new Kunde(1, "Kunde Name", "kunde@test.com");
-        String result = kunde.toString();
-        Assert.assertTrue(result.contains("id=1"));
-        Assert.assertTrue(result.contains("name=Kunde Name"));
-        Assert.assertTrue(result.contains("email=kunde@test.com"));
+        Assert.assertEquals("Kunde Name", kunde.toString());
     }
 }

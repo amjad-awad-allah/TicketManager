@@ -7,7 +7,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import exceptions.InvalidDataException;
-import exceptions.TicketNotFoundExceptione;
+import exceptions.TicketNotFoundException;
 import models.Admin;
 import models.Kunde;
 import models.Priority;
@@ -29,7 +29,7 @@ public class RepositoryTest {
         Repository<Ticket> repo = new Repository<>();
         Kunde kunde = new Kunde(1, "Kunde", "kunde@test.com");
         Admin admin = new Admin(2, "Admin", "admin@test.com");
-        Ticket ticket = new Ticket(1, "Test Ticket", "Description", Priority.HIGH, new Date(), Status.Open, kunde,
+        Ticket ticket = new Ticket(1, "Test Ticket", "Description", Priority.HIGH, new Date(), Status.Offen, kunde,
                 admin);
         boolean result = repo.add(ticket);
         Assert.assertTrue(result);
@@ -42,7 +42,7 @@ public class RepositoryTest {
         Repository<Ticket> repo = new Repository<>();
         Kunde kunde = new Kunde(1, "Kunde", "kunde@test.com");
         Admin admin = new Admin(2, "Admin", "admin@test.com");
-        Ticket ticket = new Ticket(1, "Test Ticket", "Description", Priority.HIGH, new Date(), Status.Open, kunde,
+        Ticket ticket = new Ticket(1, "Test Ticket", "Description", Priority.HIGH, new Date(), Status.Offen, kunde,
                 admin);
         repo.add(ticket);
         ArrayList<Ticket> all = repo.getAll();
@@ -58,14 +58,14 @@ public class RepositoryTest {
         Repository<Ticket> repo = new Repository<>();
         Kunde kunde = new Kunde(1, "Kunde", "kunde@test.com");
         Admin admin = new Admin(2, "Admin", "admin@test.com");
-        Ticket ticket = new Ticket(1, "Test Ticket", "Description", Priority.HIGH, new Date(), Status.Open, kunde,
+        Ticket ticket = new Ticket(1, "Test Ticket", "Description", Priority.HIGH, new Date(), Status.Offen, kunde,
                 admin);
         repo.add(ticket);
         Ticket found = repo.getById(1);
         Assert.assertEquals(ticket, found);
     }
 
-    @Test(expected = TicketNotFoundExceptione.class)
+    @Test(expected = TicketNotFoundException.class)
     public void testGetByIdNotFoundThrowsException() {
         Repository<Ticket> repo = new Repository<>();
         repo.getById(999);
@@ -76,7 +76,7 @@ public class RepositoryTest {
         Repository<Ticket> repo = new Repository<>();
         Kunde kunde = new Kunde(1, "Kunde", "kunde@test.com");
         Admin admin = new Admin(2, "Admin", "admin@test.com");
-        Ticket ticket = new Ticket(1, "Test Ticket", "Description", Priority.HIGH, new Date(), Status.Open, kunde,
+        Ticket ticket = new Ticket(1, "Test Ticket", "Description", Priority.HIGH, new Date(), Status.Offen, kunde,
                 admin);
         repo.add(ticket);
         boolean result = repo.remove(ticket);
@@ -89,11 +89,11 @@ public class RepositoryTest {
         Repository<Ticket> repo = new Repository<>();
         Kunde kunde = new Kunde(1, "Kunde", "kunde@test.com");
         Admin admin = new Admin(2, "Admin", "admin@test.com");
-        Ticket ticket = new Ticket(1, "Test Ticket", "Description", Priority.HIGH, new Date(), Status.Open, kunde,
+        Ticket ticket = new Ticket(1, "Test Ticket", "Description", Priority.HIGH, new Date(), Status.Offen, kunde,
                 admin);
         repo.add(ticket);
         Ticket updatedTicket = new Ticket(1, "Updated Ticket", "Updated Description", Priority.LOW, new Date(),
-                Status.Closed, kunde, admin);
+                Status.Geschlossen, kunde, admin);
         boolean result = repo.update(updatedTicket);
         Assert.assertTrue(result);
         Assert.assertEquals("Updated Ticket", repo.items.get(0).getTitel());
@@ -104,7 +104,7 @@ public class RepositoryTest {
         Repository<Ticket> repo = new Repository<>();
         Kunde kunde = new Kunde(1, "Kunde", "kunde@test.com");
         Admin admin = new Admin(2, "Admin", "admin@test.com");
-        Ticket ticket = new Ticket(1, "Test Ticket", "Description", Priority.HIGH, new Date(), Status.Open, kunde,
+        Ticket ticket = new Ticket(1, "Test Ticket", "Description", Priority.HIGH, new Date(), Status.Offen, kunde,
                 admin);
         repo.add(ticket);
         repo.clear();

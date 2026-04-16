@@ -40,9 +40,7 @@ public class PersistenceManager {
                 ObjectInputStream ois = new ObjectInputStream(fis)) {
 
             List<T> items = (List<T>) ois.readObject();
-            System.out.println("✓ Loaded " + items.size() + " items from file: " + fileName);
             return items;
-
         } catch (IOException e) {
             System.err.println("❌ Read error: " + e.getMessage());
             e.printStackTrace();

@@ -7,7 +7,7 @@ public class Admin extends Benutzer {
 
     @Override
     public String toString() {
-        return "Admin [id=" + getId() + ", name=" + getName() + ", email=" + getEmail() + "]";
+        return getName();
     }
 
 }

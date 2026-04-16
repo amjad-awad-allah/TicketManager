@@ -127,7 +127,7 @@ public class AppController {
 
     public void clearAllData() {
         ticketRepo.clear();
-        // We keep customers (kundeRepo) as they are needed for generating/adding tickets
+        // Keep customers for easier ticket generation/testing
         refreshUI();
     }
 

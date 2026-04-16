@@ -10,15 +10,15 @@ public class StatusTest {
     public void testEnumValues() {
         Status[] values = Status.values();
         Assert.assertEquals(3, values.length);
-        Assert.assertEquals(Status.Open, values[0]);
-        Assert.assertEquals(Status.InProgress, values[1]);
-        Assert.assertEquals(Status.Closed, values[2]);
+        Assert.assertEquals(Status.Offen, values[0]);
+        Assert.assertEquals(Status.In_Bearbeitung, values[1]);
+        Assert.assertEquals(Status.Geschlossen, values[2]);
     }
 
     @Test
     public void testValueOf() {
-        Assert.assertEquals(Status.Open, Status.valueOf("Open"));
-        Assert.assertEquals(Status.InProgress, Status.valueOf("InProgress"));
-        Assert.assertEquals(Status.Closed, Status.valueOf("Closed"));
+        Assert.assertEquals(Status.Offen, Status.valueOf("Offen"));
+        Assert.assertEquals(Status.In_Bearbeitung, Status.valueOf("In_Bearbeitung"));
+        Assert.assertEquals(Status.Geschlossen, Status.valueOf("Geschlossen"));
     }
 }

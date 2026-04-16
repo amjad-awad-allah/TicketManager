@@ -32,7 +32,7 @@ public class Ticket implements Identifiable {
     }
 
     public Ticket(String titel, String beschreibung, Priority priority, Kunde kunde) {
-        this(0, titel, beschreibung, priority, new Date(), Status.Open, kunde, null);
+        this(0, titel, beschreibung, priority, new Date(), Status.Offen, kunde, null);
     }
 
     @Override

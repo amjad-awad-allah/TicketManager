@@ -27,12 +27,12 @@ public class DashboardCard extends JPanel {
         setPreferredSize(new Dimension(200, 100));
 
         titleLabel = new JLabel(title);
-        titleLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        titleLabel.setForeground(Color.decode("#6B7280")); // Gray 500
+        titleLabel.setFont(Theme.FONT_BOLD);
+        titleLabel.setForeground(Theme.SECONDARY_TEXT_COLOR); 
 
         countLabel = new JLabel("0");
         countLabel.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        countLabel.setForeground(Color.decode("#111827")); // Gray 900
+        countLabel.setForeground(Theme.TEXT_COLOR); 
 
         add(titleLabel, BorderLayout.NORTH);
         add(countLabel, BorderLayout.CENTER);
@@ -59,7 +59,7 @@ public class DashboardCard extends JPanel {
         g2.fillRect(3, 0, 3, getHeight());
 
         // Draw subtle border around
-        g2.setColor(Color.decode("#E5E7EB"));
+        g2.setColor(Theme.BORDER_COLOR);
         g2.draw(new RoundRectangle2D.Float(0, 0, getWidth() - 1, getHeight() - 1, 16, 16));
 
         g2.dispose();

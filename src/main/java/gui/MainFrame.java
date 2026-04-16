@@ -39,7 +39,7 @@ public class MainFrame extends JFrame {
     public MainFrame(AppController controller) {
         this.controller = controller;
 
-        // Set modern look and feel for overall app
+        // Apply modern system look and feel
         try {
             UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
             UIManager.put("control", Theme.BACKGROUND_COLOR);
@@ -54,7 +54,7 @@ public class MainFrame extends JFrame {
             // Fallback to default
         }
 
-        setTitle("NextGen Ticket Manager");
+        setTitle("BFZ Ticketmanager");
         setSize(1100, 768);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -231,7 +231,8 @@ public class MainFrame extends JFrame {
         ticketTable.setSelectionForeground(Theme.TEXT_COLOR);
         ticketTable.setFillsViewportHeight(true);
         ticketTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        ticketTable.setAutoCreateRowSorter(true); // Enable column sorting
+        // Enable column sorting
+        ticketTable.setAutoCreateRowSorter(true);
         
         ticketTable.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -292,7 +293,7 @@ public class MainFrame extends JFrame {
         int total = 0, open = 0, high = 0;
         for (Ticket t : controller.getTicketRepo().getAll()) {
             total++;
-            if (t.getStatus() == models.Status.Open || t.getStatus() == models.Status.InProgress) open++; 
+            if (t.getStatus() == models.Status.Offen || t.getStatus() == models.Status.In_Bearbeitung) open++; 
             if (t.getPriority() == models.Priority.HIGH) high++;
         }
         totalCard.updateCount(total);
