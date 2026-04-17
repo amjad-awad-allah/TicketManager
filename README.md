@@ -8,6 +8,12 @@
 
 ---
 
+## 📜 Official Project Documentation
+For a detailed academic report (IHK/Bfz-Essen standards), please refer to the:
+**[PROJEKTDOKUMENTATION.md](docs/PROJEKTDOKUMENTATION.md)**
+
+---
+
 ## ✨ Features
 
 - **💎 Premium UI/UX**: Custom-built "NextGen" theme featuring glassmorphism elements, rounded components, and professional color palettes.
