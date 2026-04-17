@@ -1,0 +1,9 @@
+test\TicketNotFoundExceptionTest.class
+test\RepositoryTest.class
+test\KundeTest.class
+test\StatusTest.class
+test\AdminTest.class
+test\TicketTest.class
+test\InvalidDataExceptionTest.class
+test\ApiImporterTest.class
+test\PriorityTest.class

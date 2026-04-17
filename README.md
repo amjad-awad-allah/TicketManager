@@ -39,6 +39,22 @@ A professional Java Swing application for managing IT support tickets, featuring
    mvn exec:java -Dexec.mainClass="Main"
    ```
 
+### ⚡ Quick Verification (before submission)
+Run these three commands in order to verify everything works correctly:
+
+```powershell
+# 1. Build the project (produces the runnable JAR)
+mvn clean package
+
+# 2. Run all JUnit tests (28 tests – must all pass)
+mvn test
+
+# 3. Launch the application from the JAR
+java -jar target/TicketManager-1.0-SNAPSHOT.jar
+```
+
+> ✅ Expected result: **BUILD SUCCESS**, **Tests run: 28, Failures: 0**, and the GUI window opens.
+
 ## 📂 Project Structure
 
 - `src/main/java/Main.java`: Application entry point.

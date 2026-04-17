@@ -2,9 +2,7 @@ package gui;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.Insets;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;

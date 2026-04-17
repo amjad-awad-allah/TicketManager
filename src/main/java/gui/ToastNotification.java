@@ -18,14 +18,12 @@ import javax.swing.SwingConstants;
 import javax.swing.Timer;
 
 public class ToastNotification extends JWindow {
-    private String message;
     private final int TOAST_WIDTH = 350;
     private final int TOAST_HEIGHT = 60;
     private float opacity = 1.0f;
     private Timer fadeOutTimer;
 
     public ToastNotification(String message) {
-        this.message = message;
         setSize(TOAST_WIDTH, TOAST_HEIGHT);
         setAlwaysOnTop(true);
         setFocusableWindowState(false);
@@ -67,17 +65,14 @@ public class ToastNotification extends JWindow {
         setLocation(x, y);
 
         // Simple fade out mechanism
-        fadeOutTimer = new Timer(50, new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                opacity -= 0.05f;
-                if (opacity <= 0.0f) {
-                    opacity = 0.0f;
-                    fadeOutTimer.stop();
-                    dispose();
-                }
-                setOpacity(opacity);
+        fadeOutTimer = new Timer(50, e -> {
+            opacity -= 0.05f;
+            if (opacity <= 0.0f) {
+                opacity = 0.0f;
+                fadeOutTimer.stop();
+                dispose();
             }
+            setOpacity(opacity);
         });
         fadeOutTimer.setInitialDelay(2500); // stay solid for 2.5s before fading
         fadeOutTimer.start();

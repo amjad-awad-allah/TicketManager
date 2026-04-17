@@ -23,7 +23,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
-                    <mainClass>models.App</mainClass>
+                    <mainClass>Main</mainClass>
                 </configuration>
             </plugin>
             <plugin>

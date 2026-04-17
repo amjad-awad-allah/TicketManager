@@ -32,7 +32,7 @@ public class TicketTest {
         Kunde kunde = new Kunde(1, "Test User", "test@test.com");
         Admin admin = new Admin(1, "Admin", "admin@test.com");
         // This should throw InvalidDataException
-        new Ticket(2, "", "Description", Priority.LOW, new Date(), Status.Offen, kunde, admin);
+        Ticket ignored = new Ticket(2, "", "Description", Priority.LOW, new Date(), Status.Offen, kunde, admin);
     }
 
     @Test

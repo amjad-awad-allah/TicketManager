@@ -50,7 +50,7 @@ public class MainFrame extends JFrame {
             UIManager.put("nimbusSelectedText", Theme.SURFACE_COLOR);
             UIManager.put("nimbusSelectionBackground", Theme.PRIMARY_COLOR);
             UIManager.put("text", Theme.TEXT_COLOR);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException e) {
             // Fallback to default
         }
 

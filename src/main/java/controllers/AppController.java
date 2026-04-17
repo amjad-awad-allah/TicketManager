@@ -120,7 +120,7 @@ public class AppController {
             try {
                 addTicket(t);
             } catch (Exception e) {
-                e.printStackTrace();
+                // Silently skip or log if necessary
             }
         }
     }
